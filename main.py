@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QLineEdit
 import time
@@ -94,22 +94,26 @@ class GameWindow(QWidget):
         # (one for each player)
         self.quit_loop = False
 
-        while not self.quit_loop: 
-            self.image1 = QLabel(self)
-            pixmap = QPixmap("images/" + self.images[self.image_index])
-            pixmap = pixmap.scaled(200, 200, Qt.KeepAspectRatio)
-            self.image1.setPixmap(pixmap)
-            self.image1.move(75, 250)
-            self.image2 = QLabel(self)
-            pixmap = QPixmap("images/" + self.images[self.image_index + 1 if self.image_index < 2 else 0])
-            pixmap = pixmap.scaled(200, 200, Qt.KeepAspectRatio)
-            self.image2.setPixmap(pixmap)
-            self.image2.move(475, 250)
-            self.image_index += 1
-            if self.image_index == 3:
-                self.image_index = 0    
-            # pause the loop for 0.3 seconds
-            time.sleep(0.3)
+
+    def display_image(self):
+        if not self.quit_loop:
+            timer = QTimer(self)
+            timer.timeout.connect(self.updateImage)
+            timer.start(5*1000)
+
+    def updateImage(self):
+        self.image1 = QLabel(self)
+        pixmap = QPixmap("images/" + self.images[self.image_index])
+        pixmap = pixmap.scaled(200, 200, Qt.KeepAspectRatio)
+        self.image1.setPixmap(pixmap)
+        self.image1.move(75, 250)
+        self.image2 = QLabel(self)
+        pixmap = QPixmap("images/" + self.images[self.image_index + 1 if self.image_index < 2 else 0])
+        pixmap = pixmap.scaled(200, 200, Qt.KeepAspectRatio)
+        self.image2.setPixmap(pixmap)
+        self.image2.move(475, 250)
+        self.image_index += 1
+        self.image_index %= 3
 
 
     def keyPressEvent(self, event):
