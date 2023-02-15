@@ -93,21 +93,22 @@ class GameWindow(QWidget):
         # Display them on left and on the right of the window 
         # (one for each player)
         self.quit_loop = False
-
+        self.display_image()
 
     def display_image(self):
+        self.image1 = QLabel(self)
+        self.image2 = QLabel(self)
         if not self.quit_loop:
             timer = QTimer(self)
             timer.timeout.connect(self.updateImage)
-            timer.start(5*1000)
+            timer.start(.3*1000)
+            self.updateImage()
 
     def updateImage(self):
-        self.image1 = QLabel(self)
         pixmap = QPixmap("images/" + self.images[self.image_index])
         pixmap = pixmap.scaled(200, 200, Qt.KeepAspectRatio)
         self.image1.setPixmap(pixmap)
         self.image1.move(75, 250)
-        self.image2 = QLabel(self)
         pixmap = QPixmap("images/" + self.images[self.image_index + 1 if self.image_index < 2 else 0])
         pixmap = pixmap.scaled(200, 200, Qt.KeepAspectRatio)
         self.image2.setPixmap(pixmap)
@@ -117,6 +118,9 @@ class GameWindow(QWidget):
 
 
     def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Return:
+            self.player1_input.setReadOnly(True)
+            self.player2_input.setReadOnly(True)
         if event.key() in [Qt.Key_Escape, Qt.Key_Q, Qt.Key_S, Qt.Key_D]:
             self.quit_loop = True 
         if event.key() == Qt.Key_Q:
