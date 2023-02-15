@@ -4,7 +4,6 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QLineEdit
 import time
 import random
-from pathlib import Path
 
 class RockPaperScissorsWindow(QWidget):
     def __init__(self):
@@ -54,6 +53,11 @@ class GameWindow(QWidget):
         self.setGeometry(100, 100, 700, 500)
         self.setWindowTitle("Game Window")
         self.setStyleSheet("background-color: white; color: black;")
+
+        # players score 
+        self.player1_score = 0
+        self.player2_score = 0
+        self.winner = ""
 
         # Set the label properties
         self.label = QLabel(self)
@@ -129,26 +133,22 @@ class GameWindow(QWidget):
             self.player2_input.setReadOnly(False)
         else:
             # select random in between 0 and 2 included
+            self.image_index = [Qt.Key_Q, Qt.Key_S, Qt.Key_D].index(event.key())
             self.image_index_computer = random.randint(0, 2)
-            pcr_str = " ".join([Path(self.images[i]).stem for i in range(3)])
+            pcr_str = " ".join([self.images[i].split('.')[0] for i in range(3)])
             print(pcr_str)
-            print(f"Key pressed:  {event.text()} {Path(self.images[self.image_index]).stem}")
-            print(f'Computer choice: {self.image_index_computer} {Path(self.images[self.image_index_computer]).stem}')
+            print(f"Key pressed:  {event.text()} {self.images[self.image_index].split('.')[0]}")
+            print(f"Computer choice: {self.image_index_computer} {self.images[self.image_index_computer].split('.')[0]}")
             if event.key() in [Qt.Key_Escape, Qt.Key_Q, Qt.Key_S, Qt.Key_D]:
                 self.timer.disconnect()
                 print(f"Quit loop !")
-            if event.key() == Qt.Key_Q:
-                self.image_index = 0
-            elif event.key() == Qt.Key_S:
-                self.image_index = 1
-            elif event.key() == Qt.Key_D:
-                self.image_index = 2
             self.displayResults()
-            self.updateScores()
+            self.drawScores()
             self.updateImage()
             time.sleep(3)
             self.show()
-            self.timer.timeout.connect(self.updateImage)
+            if not self.winner:
+                self.timer.timeout.connect(self.updateImage)
 
     def displayResults(self):
         # Display the results of the game
@@ -165,16 +165,25 @@ class GameWindow(QWidget):
             print(f" {self.player1_input.text()} wins")
             # write text in green color
             self.textResult.setStyleSheet("color: green;")
+            self.player1_score += 1
 
         else:
             self.textResult.setText(f" {self.player2_input.text()} wins")
             print(f" {self.player2_input.text()} wins")
             # write text in red color
             self.textResult.setStyleSheet("color: red;")
+            self.player2_score += 1
         print("\n\n\n")
-        
+        if self.player1_score == 3:
+            self.textResult.setText(f" {self.player1_input.text()} wins the game")
+            self.textResult.setStyleSheet("color: green;")
+            self.winner == "Player 1"
+        elif self.player2_score == 3:
+            self.textResult.setText(f" {self.player2_input.text()} wins the game")
+            self.textResult.setStyleSheet("color: red;")
+            self.winner == "Player 2"
 
-    def updateScores(self):
+    def drawScores(self):
         # Update the scores of the players
         pass
 
