@@ -38,7 +38,6 @@ class RockPaperScissorsWindow(QWidget):
         self.image.move(150, 300)
 
 
-        self.winner_window = None
 
     def start_game(self):
         # Create a new game window
@@ -50,6 +49,7 @@ class GameWindow(QWidget):
     def __init__(self):
         super().__init__()
 
+        self.winner_window = None
         # Set the window properties
         self.setGeometry(100, 100, 700, 500)
         self.setWindowTitle("Game Window")
@@ -99,33 +99,33 @@ class GameWindow(QWidget):
         # Display them on left and on the right of the window 
         # (one for each player)
 
-        point_image_1 = QLabel(self)
-        point_image_2 = QLabel(self)
-        point_image_3 = QLabel(self)
-        point_image_4 = QLabel(self)
-        point_image_5 = QLabel(self)
-        point_image_6 = QLabel(self)
+        self.point_image_1 = QLabel(self)
+        self.point_image_2 = QLabel(self)
+        self.point_image_3 = QLabel(self)
+        self.point_image_4 = QLabel(self)
+        self.point_image_5 = QLabel(self)
+        self.point_image_6 = QLabel(self)
 
         pixmap = QPixmap("images/null.png").scaled(32, 32, Qt.KeepAspectRatio)
-        point_image_1.setPixmap(pixmap)
-        point_image_1.move(75, 190)
-        point_image_1.show()
-        point_image_2.setPixmap(pixmap)
-        point_image_2.move(75 + (32+ 5), 190)
-        point_image_2.show()
-        point_image_3.setPixmap(pixmap)
-        point_image_3.move(75 + 2 * (32+ 5), 190)
-        point_image_3.show()
+        self.point_image_1.setPixmap(pixmap)
+        self.point_image_1.move(75, 190)
+        self.point_image_1.show()
+        self.point_image_2.setPixmap(pixmap)
+        self.point_image_2.move(75 + (32+ 5), 190)
+        self.point_image_2.show()
+        self.point_image_3.setPixmap(pixmap)
+        self.point_image_3.move(75 + 2 * (32+ 5), 190)
+        self.point_image_3.show()
 
-        point_image_4.setPixmap(pixmap)
-        point_image_4.move(425, 190)
-        point_image_4.show()
-        point_image_5.setPixmap(pixmap)
-        point_image_5.move(425 + (32+ 5), 190)
-        point_image_5.show()
-        point_image_6.setPixmap(pixmap)
-        point_image_6.move(425 + 2 * (32+ 5), 190)
-        point_image_6.show()
+        self.point_image_4.setPixmap(pixmap)
+        self.point_image_4.move(425, 190)
+        self.point_image_4.show()
+        self.point_image_5.setPixmap(pixmap)
+        self.point_image_5.move(425 + (32 + 5), 190)
+        self.point_image_5.show()
+        self.point_image_6.setPixmap(pixmap)
+        self.point_image_6.move(425 + 2 * (32+ 5), 190)
+        self.point_image_6.show()
         
         self.display_image()
         self.show()
@@ -134,7 +134,6 @@ class GameWindow(QWidget):
         self.image1 = QLabel(self)
         self.image2 = QLabel(self)
         self.timer = QTimer(self)
-        self.textResult = QLabel(self)
         self.timer.timeout.connect(self.updateImage)
         self.timer.start(300)
         self.updateImage()
@@ -201,39 +200,28 @@ class GameWindow(QWidget):
 
     def displayResults(self):
         # Display the results of the game
-        self.textResult.move(250, 480)
-        self.textResult.setStyleSheet("background: red;")
         print(f"image_index: {self.image_index}")
         print(f"image_index_computer: {self.image_index_computer}")
 
         if self.image_index == self.image_index_computer:
-            self.textResult.setText("Draw")
-            print("Draw")
+            pass
         elif (self.image_index + 1) % 3 == self.image_index_computer:
-            self.textResult.setText(f" {self.player1_input.text()} wins")
             print(f" {self.player1_input.text()} wins")
             # write text in green color
-            self.textResult.setStyleSheet("color: green;")
             self.player1_score += 1
 
         else:
-            self.textResult.setText(f" {self.player2_input.text()} wins")
             print(f" {self.player2_input.text()} wins")
             # write text in red color
-            self.textResult.setStyleSheet("color: red;")
             self.player2_score += 1
         print(f"Player 1 score: {self.player1_score}")
         print(f"Player 2 score: {self.player2_score}")
         print("\n\n\n")
         if self.player1_score == 3 or self.player2_score == 3:
             if self.player1_score == 3:
-                self.textResult.setText(f" {self.player1_input.text()} wins the game")
-                self.textResult.setStyleSheet("color: green;")
                 self.winner = self.player1_input.text()
                 print(f" {self.player1_input.text()} wins the game")
             elif self.player2_score == 3:
-                self.textResult.setText(f" {self.player2_input.text()} wins the game")
-                self.textResult.setStyleSheet("color: red;")
                 self.winner = self.player2_input.text()
                 print(f" {self.player2_input.text()} wins the game")
             self.endGame()
@@ -247,7 +235,34 @@ class GameWindow(QWidget):
 
     def drawScores(self):
         # Update the scores of the players
-        pass
+        if self.player1_score > 0 or self.player2_score > 0:
+            pixmap = QPixmap("images/point.png").scaled(32, 32, Qt.KeepAspectRatio)
+        else: return
+        if self.player1_score == 1:
+            self.point_image_1.setPixmap(pixmap)
+            self.point_image_1.move(75, 190)
+            self.point_image_1.show()
+        elif self.player1_score == 2:
+            self.point_image_2.setPixmap(pixmap)
+            self.point_image_2.move(75 + (32 + 5), 190)
+            self.point_image_2.show()
+        elif self.player1_score == 3:
+            self.point_image_3.setPixmap(pixmap)
+            self.point_image_3.move(75 + 2 * (32 + 5), 190)
+            self.point_image_3.show()
+        if self.player2_score == 1:
+            self.point_image_4.setPixmap(pixmap)
+            self.point_image_4.move(425, 190)
+            self.point_image_4.show()
+        elif self.player2_score == 2:
+            self.point_image_5.setPixmap(pixmap)
+            self.point_image_5.move(425 + (32 + 5), 190)
+            self.point_image_5.show()
+        elif self.player2_score == 3:
+            self.point_image_6.setPixmap(pixmap)
+            self.point_image_6.move(425 + 2 * (32 + 5), 190)
+            self.point_image_6.show()
+        
 
 class WinnerWindow(QWidget):
     def __init__(self, winner):
@@ -268,6 +283,16 @@ class WinnerWindow(QWidget):
         self.image_wins.move(50, 50)
 
         self.label.move(50, 50)
+        
+        # add a button to restart the game
+        self.button = QPushButton("Restart", self)
+        self.button.move(300, 450)
+        self.button.clicked.connect(self.restartGame)
+
+    def restartGame(self):
+        self.close()
+        self.window = GameWindow()
+        self.window.show()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
