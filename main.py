@@ -37,6 +37,9 @@ class RockPaperScissorsWindow(QWidget):
         self.image.setPixmap(pixmap)
         self.image.move(150, 300)
 
+
+        self.winner_window = None
+
     def start_game(self):
         # Create a new game window
         self.game_window = GameWindow()
@@ -175,7 +178,7 @@ class GameWindow(QWidget):
             self.player2_input.setReadOnly(False)
         elif event.key() == Qt.Key_Space and self.winner == "":
             self.timer.start(300)
-        else:
+        elif event.key() in [Qt.Key_Escape, Qt.Key_Q, Qt.Key_S, Qt.Key_D]:
             self.timer.stop()
             # select random in between 0 and 2 included
             self.image_index = [Qt.Key_Q, Qt.Key_S, Qt.Key_D].index(event.key())
@@ -189,9 +192,12 @@ class GameWindow(QWidget):
                 self.timer.stop()
                 print(f"Quit loop !")
             self.displayResults()
-            self.drawScores()
-            self.showImageChoices()
-            self.show()
+            if self.winner_window is None:
+                self.drawScores()
+                self.showImageChoices()
+                self.show()
+        else:
+            pass
 
     def displayResults(self):
         # Display the results of the game
@@ -233,9 +239,11 @@ class GameWindow(QWidget):
             self.endGame()
 
     def endGame(self):
+        print('New window')
         self.winner_window = WinnerWindow(self.winner)
         self.winner_window.show()
         self.close()
+
 
     def drawScores(self):
         # Update the scores of the players
@@ -245,7 +253,7 @@ class WinnerWindow(QWidget):
     def __init__(self, winner):
         super().__init__()
         self.setWindowTitle("Winner")
-        self.setGeometry(0, 0, 600, 600)
+        self.setGeometry(100, 100, 700, 500)
         self.label = QLabel(self)
         self.label.setText(f"{winner} wins the game !")
         self.label.move(100, 10)
