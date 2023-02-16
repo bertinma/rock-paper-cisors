@@ -43,8 +43,6 @@ class RockPaperScissorsWindow(QWidget):
         self.game_window.show()
         self.close()
 
-
-
 class GameWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -97,7 +95,37 @@ class GameWindow(QWidget):
         # is triggered
         # Display them on left and on the right of the window 
         # (one for each player)
+
+        point_image_1 = QLabel(self)
+        point_image_2 = QLabel(self)
+        point_image_3 = QLabel(self)
+        point_image_4 = QLabel(self)
+        point_image_5 = QLabel(self)
+        point_image_6 = QLabel(self)
+
+        pixmap = QPixmap("images/null.png").scaled(32, 32, Qt.KeepAspectRatio)
+        point_image_1.setPixmap(pixmap)
+        point_image_1.move(75, 190)
+        point_image_1.show()
+        point_image_2.setPixmap(pixmap)
+        point_image_2.move(75 + (32+ 5), 190)
+        point_image_2.show()
+        point_image_3.setPixmap(pixmap)
+        point_image_3.move(75 + 2 * (32+ 5), 190)
+        point_image_3.show()
+
+        point_image_4.setPixmap(pixmap)
+        point_image_4.move(425, 190)
+        point_image_4.show()
+        point_image_5.setPixmap(pixmap)
+        point_image_5.move(425 + (32+ 5), 190)
+        point_image_5.show()
+        point_image_6.setPixmap(pixmap)
+        point_image_6.move(425 + 2 * (32+ 5), 190)
+        point_image_6.show()
+        
         self.display_image()
+        self.show()
 
     def display_image(self):
         self.image1 = QLabel(self)
@@ -123,6 +151,20 @@ class GameWindow(QWidget):
         self.image2.move(475, 250)
         self.image_index_computer = None
 
+    def showImageChoices(self):
+        self.image1.clear()
+        self.image2.clear()
+        pixmap = QPixmap("images/" + self.images[self.image_index])
+        pixmap = pixmap.scaled(200, 200, Qt.KeepAspectRatio)
+        self.image1.setPixmap(pixmap)
+        self.image1.move(75, 250)
+        self.image1.show()
+        pixmap = QPixmap("images/" + self.images[self.image_index_computer])
+        pixmap = pixmap.scaled(200, 200, Qt.KeepAspectRatio)
+        self.image2.setPixmap(pixmap)
+        self.image2.move(475, 250)
+        self.image2.show()
+        self.show()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Return:
@@ -131,7 +173,10 @@ class GameWindow(QWidget):
         elif event.key() == Qt.Key_M:
             self.player1_input.setReadOnly(False)
             self.player2_input.setReadOnly(False)
+        elif event.key() == Qt.Key_Space and self.winner == "":
+            self.timer.start(300)
         else:
+            self.timer.stop()
             # select random in between 0 and 2 included
             self.image_index = [Qt.Key_Q, Qt.Key_S, Qt.Key_D].index(event.key())
             self.image_index_computer = random.randint(0, 2)
@@ -140,15 +185,13 @@ class GameWindow(QWidget):
             print(f"Key pressed:  {event.text()} {self.images[self.image_index].split('.')[0]}")
             print(f"Computer choice: {self.image_index_computer} {self.images[self.image_index_computer].split('.')[0]}")
             if event.key() in [Qt.Key_Escape, Qt.Key_Q, Qt.Key_S, Qt.Key_D]:
-                self.timer.disconnect()
+                # self.timer.disconnect()
+                self.timer.stop()
                 print(f"Quit loop !")
             self.displayResults()
             self.drawScores()
-            self.updateImage()
-            time.sleep(3)
+            self.showImageChoices()
             self.show()
-            if not self.winner:
-                self.timer.timeout.connect(self.updateImage)
 
     def displayResults(self):
         # Display the results of the game
@@ -173,19 +216,50 @@ class GameWindow(QWidget):
             # write text in red color
             self.textResult.setStyleSheet("color: red;")
             self.player2_score += 1
+        print(f"Player 1 score: {self.player1_score}")
+        print(f"Player 2 score: {self.player2_score}")
         print("\n\n\n")
-        if self.player1_score == 3:
-            self.textResult.setText(f" {self.player1_input.text()} wins the game")
-            self.textResult.setStyleSheet("color: green;")
-            self.winner == "Player 1"
-        elif self.player2_score == 3:
-            self.textResult.setText(f" {self.player2_input.text()} wins the game")
-            self.textResult.setStyleSheet("color: red;")
-            self.winner == "Player 2"
+        if self.player1_score == 3 or self.player2_score == 3:
+            if self.player1_score == 3:
+                self.textResult.setText(f" {self.player1_input.text()} wins the game")
+                self.textResult.setStyleSheet("color: green;")
+                self.winner = self.player1_input.text()
+                print(f" {self.player1_input.text()} wins the game")
+            elif self.player2_score == 3:
+                self.textResult.setText(f" {self.player2_input.text()} wins the game")
+                self.textResult.setStyleSheet("color: red;")
+                self.winner = self.player2_input.text()
+                print(f" {self.player2_input.text()} wins the game")
+            self.endGame()
+
+    def endGame(self):
+        self.winner_window = WinnerWindow(self.winner)
+        self.winner_window.show()
+        self.close()
 
     def drawScores(self):
         # Update the scores of the players
         pass
+
+class WinnerWindow(QWidget):
+    def __init__(self, winner):
+        super().__init__()
+        self.setWindowTitle("Winner")
+        self.setGeometry(0, 0, 600, 600)
+        self.label = QLabel(self)
+        self.label.setText(f"{winner} wins the game !")
+        self.label.move(100, 10)
+        self.image_wins = QLabel(self)
+        if winner == 'Computer':
+            self.label.setStyleSheet("color: red;")
+            pixmap = QPixmap("images/looser.jpg")
+        else:
+            self.label.setStyleSheet("color: green;")
+            pixmap = QPixmap("images/winner.jpg")
+        self.image_wins.setPixmap(pixmap)
+        self.image_wins.move(50, 50)
+
+        self.label.move(50, 50)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
