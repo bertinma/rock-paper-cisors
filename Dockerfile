@@ -12,7 +12,6 @@
 FROM fadawar/docker-pyqt5:latest
 
 WORKDIR /app
-COPY main.py main.py
-COPY images/ /app/images/
+COPY . . 
 
 CMD ["python", "main.py"]

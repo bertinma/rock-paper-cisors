@@ -4,3 +4,8 @@
 Dockerfile 
 README.md
 __pycache__/
+.git/
+.gitignore 
+.vscode/ 
+requirements.txt
+.dockerignore 
